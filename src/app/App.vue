@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
 } from "lucide-vue-next";
 import { createDocument } from "../shared/document";
+import { effectiveScene } from "../shared/playout";
 import { createAudio, AudioPanel } from "../features/audio";
 import { StageCanvas, ThemePanel } from "../features/visuals";
 import { createScenes, ScenePanel, SceneStrip } from "../features/scenes";
@@ -19,23 +20,32 @@ import {
   SignalMeter,
 } from "../features/live";
 import { createRecorder, RecordPanel, TakeList } from "../features/recording";
+
 const doc = createDocument(),
-  audio = createAudio(doc),
   scenes = createScenes(doc),
+  audio = createAudio(doc, () => effectiveScene(doc.scenes, scenes.playout)?.audio),
   controls = createControls(doc),
   recorder = createRecorder();
 const canvas = ref<HTMLCanvasElement>(),
   stage = ref<HTMLElement>();
 const fullError = ref("");
+
 const unbind = bindShortcuts({
   play: () => {
     void (audio.state.playing ? audio.pause() : audio.play());
   },
-  scene: (i) => scenes.select(doc.scenes[i].id),
+  // 数字键只改变预演选择（编辑预览），不直接动舞台。
+  scene: (i) => {
+    const target = scenes.visibleScenes.value[i];
+    if (target) scenes.previewSelect(target.id);
+  },
+  // Enter 才正式切场。
+  take: scenes.takePreview,
   blackout: controls.blackout,
   freeze: controls.freeze,
   tap: controls.tap,
 });
+
 function start() {
   if (canvas.value) recorder.start(canvas.value, audio.stream());
 }
@@ -80,9 +90,10 @@ onUnmounted(() => {
     </div>
     <main>
       <aside class="left-column">
-        <AudioPanel :engine="audio" :doc="doc" /><ScenePanel
+        <AudioPanel :engine="audio" :scene="scenes.preview.value" /><ScenePanel
           :doc="doc"
           :store="scenes"
+          :audio="audio"
         />
       </aside>
       <div class="center-column">
@@ -90,9 +101,12 @@ onUnmounted(() => {
           <div class="stage-toolbar">
             <span
               ><i class="dot" :class="{ on: audio.state.playing }"></i>
-              {{ audio.state.playing ? "LIVE PREVIEW" : "STAGE PREVIEW" }}</span
+              {{ audio.state.playing ? "LIVE OUTPUT" : "STAGE OUTPUT" }}</span
             ><span
-              >{{ scenes.active.value.name }}
+              >{{ scenes.onAir.value.name }}
+              <small v-if="scenes.transitioning.value" class="transition-flag"
+                >过渡中</small
+              >
               <button @click="fullscreen" aria-label="全屏预览">
                 <Maximize2 :size="15" /></button
             ></span>
@@ -100,23 +114,27 @@ onUnmounted(() => {
           <div class="canvas-wrap">
             <StageCanvas
               :doc="doc"
+              :playout="scenes.playout"
               :read="() => audio.frame.value"
+              :on-frame="scenes.flushRemovals"
               @ready="canvas = $event"
             />
             <div class="stage-caption">
               <small
                 >RESONANCE / 0{{
-                  doc.scenes.findIndex((s) => s.id === doc.activeId) + 1
+                  doc.scenes.findIndex((s) => s.id === scenes.onAir.value.id) +
+                  1
                 }}</small
-              ><span>{{ scenes.active.value.name }}</span>
+              ><span>{{ scenes.onAir.value.name }}</span>
             </div>
             <span class="canvas-resolution">16:9 · 1280 × 720</span>
           </div>
           <SignalMeter :frame="audio.frame.value" />
         </section>
         <p v-if="fullError" role="alert">{{ fullError }}</p>
-        <SceneStrip :doc="doc" @select="scenes.select" /><ThemePanel
-          :scene="scenes.active.value"
+        <SceneStrip :doc="doc" :store="scenes" /><ThemePanel
+          :scene="scenes.preview.value"
+          :on-air="scenes.isOnAir(scenes.preview.value.id)"
         /><TakeList :recorder="recorder" />
       </div>
       <aside class="right-column">
@@ -128,8 +146,9 @@ onUnmounted(() => {
         <div class="note">
           <Radio :size="19" />
           <p>
-            跟随声音，自由即兴。<small
-              >用 1–4 切换场景，空格控制播放。<br />让灵感留在当下。</small
+            预演与播出分离。<small
+              >数字键或单击只改编辑预览，Enter / 双击正式切场。<br />紧急黑场 B
+              仍直接作用于正式输出。</small
             >
           </p>
           <ArrowUpRight :size="17" />
@@ -141,8 +160,8 @@ onUnmounted(() => {
         ><SlidersHorizontal :size="13" /> ALL SYSTEMS READY
         <i>·</i> 浏览器本地运行</span
       ><span
-        >SPACE 播放 / 暂停 <i>·</i> 1–4 场景 <i>·</i> B 黑场 <i>·</i> F
-        冻结</span
+        >SPACE 播放 <i>·</i> 1–9 选择预演 <i>·</i> ENTER 正式切场 <i>·</i> B
+        黑场 <i>·</i> F 冻结</span
       ><span>MADE FOR THE MOMENT ↗</span>
     </footer>
   </div>

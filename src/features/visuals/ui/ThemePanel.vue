@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import type { Scene } from "../../../shared/types";
 import { themes } from "../model/themes";
-defineProps<{ scene: Scene }>();
+defineProps<{ scene: Scene; onAir: boolean }>();
 </script>
 <template>
   <section class="panel themes">
     <div class="panel-heading">
       <span>03 / VISUAL PALETTE</span><span>4 THEMES</span>
     </div>
+    <p class="palette-scope">
+      正在编辑预演场景「{{ scene.name }}」<em v-if="onAir">（该场景正在播出，改动将在下次切场后体现）</em>
+    </p>
     <div class="theme-options">
       <button
         v-for="t in themes"

@@ -34,13 +34,6 @@ defineProps<{ doc: StageDocument; controls: LiveControls; beat: boolean }>();
     ><label class="toggle"
       ><input type="checkbox" v-model="doc.strobe" />节拍闪光
       <small>含快速闪光</small></label
-    ><label class="control"
-      >频谱平滑 <b>{{ doc.smoothing.toFixed(2) }}</b><input
-        type="range"
-        min="0"
-        max="0.95"
-        step="0.01"
-        v-model.number="doc.smoothing"
-    /></label>
+    >
   </section>
 </template>

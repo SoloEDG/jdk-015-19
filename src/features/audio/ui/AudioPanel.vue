@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { AudioEngine } from "../model/engine";
-import type { StageDocument } from "../../../shared/types";
+import type { Scene } from "../../../shared/types";
 import { clock } from "../../../shared/math";
-defineProps<{ engine: AudioEngine; doc: StageDocument }>();
+defineProps<{ engine: AudioEngine; scene: Scene }>();
 function load(e: Event, engine: AudioEngine) {
   const f = (e.target as HTMLInputElement).files?.[0];
   if (f) void engine.file(f);
@@ -62,22 +62,31 @@ function load(e: Event, engine: AudioEngine) {
         ></span
       ><span class="tag">{{ engine.state.loading ? "解码中" : "AUDIO" }}</span>
     </div>
+    <p class="audio-scope">音频响应绑定到预演场景「{{ scene.name }}」，切场后才作用于正式输出。</p>
     <label class="control"
-      >监听音量 <b>{{ Math.round(doc.gain * 100) }}%</b
+      >监听音量 <b>{{ Math.round(scene.audio.gain * 100) }}%</b
       ><input
         type="range"
         min="0"
         max="1"
         step="0.01"
-        v-model.number="doc.gain" /></label
+        v-model.number="scene.audio.gain" /></label
     ><label class="control"
-      >响应灵敏度 <b>{{ doc.sensitivity.toFixed(1) }}×</b
+      >响应灵敏度 <b>{{ scene.audio.sensitivity.toFixed(1) }}×</b
       ><input
         type="range"
         min="0.3"
         max="3"
         step="0.1"
-        v-model.number="doc.sensitivity"
+        v-model.number="scene.audio.sensitivity" /></label
+    ><label class="control"
+      >频谱平滑 <b>{{ scene.audio.smoothing.toFixed(2) }}</b
+      ><input
+        type="range"
+        min="0"
+        max="0.95"
+        step="0.01"
+        v-model.number="scene.audio.smoothing"
     /></label>
     <p v-if="engine.state.error" role="alert">{{ engine.state.error }}</p>
     <div class="input-level">

@@ -1,4 +1,9 @@
 export type SceneKind = "orbit" | "spectrum" | "wave" | "tunnel";
+export interface SceneAudio {
+  gain: number;
+  sensitivity: number;
+  smoothing: number;
+}
 export interface Scene {
   id: string;
   name: string;
@@ -6,6 +11,8 @@ export interface Scene {
   theme: string;
   intensity: number;
   speed: number;
+  audio: SceneAudio;
+  removing?: boolean;
 }
 export interface Analysis {
   bins: number[];
@@ -17,10 +24,7 @@ export interface Analysis {
 }
 export interface StageDocument {
   scenes: Scene[];
-  activeId: string;
-  gain: number;
-  sensitivity: number;
-  smoothing: number;
+  onAirId: string;
   transition: number;
   blackout: boolean;
   frozen: boolean;

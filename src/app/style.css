@@ -377,6 +377,84 @@ input[type="checkbox"] {
 .scene-panel > .panel-heading {
   margin-bottom: 17px;
 }
+.preview-block {
+  border: 1px solid #34303f;
+  border-radius: 7px;
+  background: #0f1017;
+  padding: 10px;
+  margin-bottom: 14px;
+}
+.preview-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.preview-tag {
+  font: 8px "Space Grotesk";
+  letter-spacing: 1.2px;
+  color: #8d80ad;
+}
+.preview-name {
+  font: 10px "Space Grotesk";
+  color: #d5c7fc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.take-button {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  font-size: 9px;
+  background: #4a3c66;
+  border-color: #6f5e9d;
+  color: #efe7ff;
+  white-space: nowrap;
+}
+.take-button:hover:not(:disabled) {
+  background: #5a4a7d;
+}
+.take-button:disabled {
+  background: #26232e;
+  border-color: #34303f;
+  color: #7d7c8c;
+}
+.preview-canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  background: #090918;
+}
+.preview-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: 9px;
+  line-height: 1.5;
+  color: #686b7a;
+}
+.audio-scope {
+  font-size: 9px;
+  color: #8d80ad;
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.palette-scope {
+  font-size: 10px;
+  color: #9b94ac;
+  margin: 14px 0 0;
+  line-height: 1.6;
+}
+.palette-scope em {
+  color: #c0a3f6;
+}
+.scene-list {
+  display: flex;
+  flex-direction: column;
+}
 .scene-row {
   padding: 8px;
   margin: 3px -5px;
@@ -387,10 +465,84 @@ input[type="checkbox"] {
   width: calc(100% + 10px);
   background: transparent;
   border-color: transparent;
+  position: relative;
 }
 .scene-row.active {
   background: #24202f;
   border: 1px solid #4b3d63;
+}
+.scene-row.onair .scene-thumb {
+  outline: 1px solid #b690e8;
+  outline-offset: 1px;
+}
+.scene-row.pending {
+  opacity: 0.72;
+  border-style: dashed;
+  border-color: #5a4638;
+  background: #1f1712;
+}
+.live-badge {
+  display: inline-block;
+  margin-top: 5px;
+  font: 7px "Space Grotesk";
+  letter-spacing: 1px;
+  color: #cdb6f3;
+  border: 1px solid #4b3d63;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+.live-badge em {
+  color: #e0b08a;
+}
+.pending-badge {
+  margin-left: auto;
+  font: 8px "Space Grotesk";
+  letter-spacing: 1px;
+  color: #e0b08a;
+  border: 1px solid #5a4638;
+  border-radius: 3px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+.pending-note {
+  color: #b08a6e !important;
+}
+.scene-meta {
+  min-width: 0;
+  flex: 1;
+}
+.scene-actions {
+  display: flex;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.scene-row:hover .scene-actions,
+.scene-row.active .scene-actions {
+  opacity: 1;
+}
+.scene-actions button {
+  padding: 4px;
+  border: 1px solid #373743;
+  background: #202129;
+  border-radius: 4px;
+  color: #a9a5bb;
+  display: inline-flex;
+}
+.scene-actions button:hover:not(:disabled) {
+  background: #2f2c3d;
+  border-color: #6f5e9d;
+  color: #e2d8fa;
+}
+.scene-actions button.danger-icon:hover:not(:disabled) {
+  background: #4a2730;
+  border-color: #8a4654;
+  color: #ffc7d2;
+}
+.transition-flag {
+  color: #e0b08a;
+  letter-spacing: 1px;
+  margin-left: 8px;
 }
 .scene-thumb {
   width: 46px;
@@ -551,6 +703,14 @@ input[type="checkbox"] {
   font: 7px "Space Grotesk";
   color: #cdb6f3;
   margin-left: 6px;
+}
+.scene-strip button.onair {
+  border-color: #6f5e9d;
+  background: #241f33;
+}
+.scene-strip button.selected:not(.onair) {
+  outline: 1px solid #4b3d63;
+  outline-offset: 1px;
 }
 .theme-options {
   display: grid;

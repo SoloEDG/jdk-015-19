@@ -1,9 +1,10 @@
 import type { Analysis, Scene, Theme } from "../../../shared/types";
+type RenderableScene = Pick<Scene, "kind" | "intensity" | "speed" | "theme">;
 export function drawScene(
   c: CanvasRenderingContext2D,
   w: number,
   h: number,
-  s: Scene,
+  s: RenderableScene,
   a: Analysis,
   t: Theme,
   phase: number,

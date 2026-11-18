@@ -1,5 +1,12 @@
 import { reactive } from "vue";
 import type { StageDocument } from "./types";
+
+const defaultAudio = {
+  gain: 0.65,
+  sensitivity: 1.2,
+  smoothing: 0.78,
+};
+
 export function createDocument(): StageDocument {
   return reactive({
     scenes: [
@@ -10,6 +17,7 @@ export function createDocument(): StageDocument {
         theme: "violet",
         intensity: 0.8,
         speed: 1,
+        audio: { ...defaultAudio },
       },
       {
         id: "s2",
@@ -18,6 +26,7 @@ export function createDocument(): StageDocument {
         theme: "mint",
         intensity: 0.75,
         speed: 1,
+        audio: { ...defaultAudio },
       },
       {
         id: "s3",
@@ -26,6 +35,7 @@ export function createDocument(): StageDocument {
         theme: "ember",
         intensity: 0.7,
         speed: 0.6,
+        audio: { ...defaultAudio },
       },
       {
         id: "s4",
@@ -34,12 +44,10 @@ export function createDocument(): StageDocument {
         theme: "ice",
         intensity: 0.9,
         speed: 1.2,
+        audio: { ...defaultAudio },
       },
     ],
-    activeId: "s1",
-    gain: 0.65,
-    sensitivity: 1.2,
-    smoothing: 0.78,
+    onAirId: "s1",
     transition: 1.2,
     blackout: false,
     frozen: false,

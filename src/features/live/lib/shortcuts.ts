@@ -1,6 +1,7 @@
 export function bindShortcuts(actions: {
   play: () => void;
   scene: (i: number) => void;
+  take: () => void;
   blackout: () => void;
   freeze: () => void;
   tap: () => void;
@@ -17,7 +18,10 @@ export function bindShortcuts(actions: {
       e.preventDefault();
       actions.play();
     }
-    if (/^[1-4]$/.test(e.key)) actions.scene(Number(e.key) - 1);
+    // 数字快捷键按场景列表的当前顺序（重排后即新顺序）选择预演场景。
+    if (/^[1-9]$/.test(e.key)) actions.scene(Number(e.key) - 1);
+    // Enter 把当前预演场景正式切上舞台。
+    if (e.code === "Enter") actions.take();
     if (e.key.toLowerCase() === "b") actions.blackout();
     if (e.key.toLowerCase() === "f") actions.freeze();
     if (e.key.toLowerCase() === "t") actions.tap();

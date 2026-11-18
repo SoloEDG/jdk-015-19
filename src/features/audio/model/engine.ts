@@ -1,8 +1,23 @@
 import { reactive, shallowRef } from "vue";
-import type { Analysis, StageDocument } from "../../../shared/types";
+import type { Analysis, SceneAudio, StageDocument } from "../../../shared/types";
 import { analyse } from "../lib/analyse";
 import { demoBuffer } from "../lib/demo";
-export function createAudio(doc: StageDocument) {
+
+const FALLBACK_AUDIO: SceneAudio = {
+  gain: 0.65,
+  sensitivity: 1.2,
+  smoothing: 0.78,
+};
+
+export function createAudio(
+  doc: StageDocument,
+  /**
+   * 返回当前正式播出场景的音频响应参数。
+   * 过渡期间返回的仍是旧场景（过渡完成后才切到新参数），
+   * 保证旧版本按原参数完成本次过渡。
+   */
+  liveAudio?: () => SceneAudio | undefined,
+) {
   const state = reactive({
     playing: false,
     source: "demo",
@@ -61,8 +76,9 @@ export function createAudio(doc: StageDocument) {
     if (!ctx) return;
     const f = new Uint8Array(analyser.frequencyBinCount),
       w = new Uint8Array(analyser.fftSize);
-    analyser.smoothingTimeConstant = doc.smoothing;
-    gain.gain.value = state.source === "mic" ? 0 : doc.gain;
+    const audioCfg = liveAudio?.() ?? FALLBACK_AUDIO;
+    analyser.smoothingTimeConstant = audioCfg.smoothing;
+    gain.gain.value = state.source === "mic" ? 0 : audioCfg.gain;
     analyser.getByteFrequencyData(f);
     analyser.getByteTimeDomainData(w);
     state.position = state.playing ? offset + ctx.currentTime - origin : offset;
@@ -70,7 +86,7 @@ export function createAudio(doc: StageDocument) {
       f,
       w,
       state.position,
-      doc.sensitivity,
+      audioCfg.sensitivity,
       frame.value.bass,
     );
     raf = requestAnimationFrame(pump);
